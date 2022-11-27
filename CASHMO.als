@@ -25,7 +25,7 @@ fact { holds = Person2 -> Account2}
 fact { value = Account1 -> Value1}
 fact { value = Account2 -> Value2}
 
-sig State{
+sig valueState{
 	empty: set Value,
 	full: set Value
 }
@@ -35,17 +35,13 @@ fact initialState{
 	let s0 = ord/first |  (s0.empty = Account1.value && s0.empty = Account2.value) && no s0.full
 }
 
-//fact nextState{
-//	let s1 = ord/second | (s1.full = Account1.value || s1.full = Account2.value)
-//}
-
-
+//
 pred hasFullAmount [oldValue, newValue] {
 	newValue = oldValue
 }
 
 fact stateTransition1{
-	all s: State, t: ord/next[s]
+	all s: valueState, t: ord/next[s]
 	Account in s.empty =>
 		hasFullAmount[s.empty, s.full]
 }
