@@ -1,4 +1,4 @@
-// this is the model for CASHMO
+// this is the HELPER model for CASHMO
 module cashmo
 
 open util/ordering[State] as ord
@@ -57,35 +57,3 @@ fact stateTransition1{
 pred terminatingState { ord/last.empty = Value}
 
 run terminatingState for 5 State expect 1
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
