@@ -1,4 +1,4 @@
-// this is the model for CASHMO
+// this is the HELPER model for CASHMO
 module cashmo
 
 open util/ordering[State] as ord
@@ -42,35 +42,18 @@ fact initialState{
 					(s0.full = Card1.value && s0.full = Card2.value)
 }
 
+// FOR FUTURE IMPLEMENTATION
+//
+//pred hasFullAmount [oldValue, newValue] {
+//	newValue = oldValue
+//}
+//
+fact stateTransition1{
+	all s: State, t: ord/next[s]
+//	Account in s.empty =>
+//		hasFullAmount[s.empty, s.full]
+}
 
+pred terminatingState { ord/last.empty = Value}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+run terminatingState for 5 State expect 1
