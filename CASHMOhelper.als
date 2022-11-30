@@ -48,12 +48,14 @@ fact initialState{
 //	newValue = oldValue
 //}
 //
-fact stateTransition1{
-	all s: State, t: ord/next[s]
-//	Account in s.empty =>
-//		hasFullAmount[s.empty, s.full]
-}
+//fact stateTransition1{
+//	all s: State, t: ord/next[s]
+	//Account in s.empty =>
+		//hasFullAmount[s.empty, s.full]
+//}
+
+pred Show{}
 
 pred terminatingState { ord/last.empty = Value}
 
-run terminatingState for 5 State expect 1
+run Show for 2 Person
