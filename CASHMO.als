@@ -3,47 +3,73 @@ module cashmo
 
 open util/ordering[State] as ord
 
-// an account has a value
-abstract sig Value{}
+sig Client{
+	account: lone Cashmo,
+	bank: lone Bank
+}
 
-// an account is held by a Person
 abstract sig Account{
-	value: set Value
+	owner: set Client
 }
 
-abstract sig Person{
-	account: set Account,
-	bank: set Account,
-	card: set Account
-}
-
-// there are two people in the model who each olds an account with a value
-one sig Person1, Person2 extends Person{}
-one sig Account1, Account2 extends Account{}
-one sig Bank1, Bank2 extends Account{}
-one sig Card1, Card2 extends Account{}
-one sig AVal1, AVal2, BVal1, BVal2, CVal1, CVal2 extends Value{}
-
-// each person has a cashmo account, bank account, and a credit/debit card
-fact { account = Person1 -> Account1 && bank = Person1 -> Bank1 && card = Person1 -> Card1 }
-fact { account = Person2 -> Account2 && bank = Person2 -> Bank2 && card = Person2 -> Card2 }
-fact { value = Account1 -> AVal1 && value = Bank1 -> BVal1 && value = Card1 -> CVal1}
-fact { value = Account2 -> AVal2 && value = Bank2 -> BVal2 && value = Card2 -> CVal2}
+sig Cashmo extends Account{}
+sig Bank extends Account{}
 
 sig State{
-	empty: set Value,
-	full: set Value
+	empty: some Account,
+	full: some Account,
+	sufficient: some Account,
+	notSufficient: some Account
 }
 
-// each cashmo account starts with an empty value and each bank and card starts with a full value
+// each client has their own unique bank and Cashmo account
+fact eachHasOneOfEach{
+	all c : Client | 
+	( c.account.owner = c && c.bank.owner = c)
+}
+
+// all external bank accounts are full and all Cashmo accounts are empty at start
+// if an Account object is empty, it is not sufficient to transfer funds out of
 fact initialState{
-	let s0 = ord/first |  (s0.empty = Account1.value && s0.empty = Account2.value) && 
-					(s0.full = Bank1.value && s0.full = Bank2.value) &&
-					(s0.full = Card1.value && s0.full = Card2.value)
+	let s0 = ord/first, c = Client | 
+	( s0.empty = c.account && s0.full = c.bank && s0.sufficient = c.bank && s0.notSufficient = c.account)
 }
 
+// ensuring that each bank or Cashmo accounts cannot be sufficient AND not sufficient at the same state
+// and that if the cashmo account or the bank account is empty, then it cannot be sufficient
+assert eitherSufficientOrNotSufficient{
+	no c : Client, s: State.sufficient, n: State.notSufficient |
+	(c.account = s && c.account = n) && (c.bank = s && c.bank = n)
+}
 
+assert notEmptyAndSufficient{
+	no c : Client, e: State.empty, s: State.sufficient |
+	( c.account = e && c.account = s ) && ( c.bank = e && c.bank = s )
+}
 
+// ensuring that a bank or Cashmo account cannot be empty AND full at the same State
+assert eitherFullOrEmpty{
+	no e : State.empty, f : State.full, c : Client |
+	( c.account = e && c.account = f) && ( c.bank = e && c.bank = f)
+}
+
+// find the cashmo of that a person owns
+fun lookupCashmo [c: Client]: set Cashmo{
+	c.account & Cashmo
+}
+
+assert clientHasAccount{
+	all c: Client | some c.account
+}
+
+assert clientHasBank{
+	all c: Client | some c.bank
+}
+ 
+
+pred show{}
+
+run show for exactly 2 Client, 4 Account, 2 State
 
 
 
