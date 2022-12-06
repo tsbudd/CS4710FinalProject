@@ -16,10 +16,10 @@ sig Cashmo extends Account{}
 sig Bank extends Account{}
 
 sig State{
-	empty: set Account,
-	full: set Account,
-	sufficient: set Account,
-	notSufficient: set Account
+	empty: some Account,
+	full: some Account,
+	sufficient: some Account,
+	notSufficient: some Account
 }
 
 // each client has their own unique bank and Cashmo account
@@ -38,17 +38,38 @@ fact initialState{
 // ensuring that each bank or Cashmo accounts cannot be sufficient AND not sufficient at the same state
 // and that if the cashmo account or the bank account is empty, then it cannot be sufficient
 fact eitherSufficientOrNotSufficient{
-	no c : Client, e: State.empty, s: State.sufficient, n: State.notSufficient |
-	( c.account = e && c.account = s ) && (c.account = s && c.account = n)
-	&& ( c.bank = e && c.bank = s ) && (c.bank = s && c.bank = n)
+	no c : Client, s: State.sufficient, n: State.notSufficient |
+	(c.account = s && c.account = n) && (c.bank = s && c.bank = n)
+}
+
+fact notEmptyAndSufficient{
+	no c : Client, e: State.empty, s: State.sufficient |
+	( c.account = e && c.account = s ) && ( c.bank = e && c.bank = s )
 }
 
 // ensuring that a bank or Cashmo account cannot be empty AND full at the same State
 fact eitherFullOrEmpty{
 	no e : State.empty, f : State.full, c : Client |
-	( c.account = e && c.account = f)
-	&& ( c.bank = e && c.bank = f)
+	( c.account = e && c.account = f) && ( c.bank = e && c.bank = f)
 }
+
+// find the cashmo of that a person owns
+fun lookupCashmo [c: Client]: set Cashmo{
+	c.account & Cashmo
+}
+
+//pred notBoth[a: Account, s1: State, s2: State]{
+//	
+//}
+
+//fun lookupCashmoSufficiency [c: Client, s: State]: set Cashmo{
+//	
+//}
+
+
+//fun lookup [b: Book, n: Name] : set Addr {
+//  n.^(b.addr) & Addr
+//}
 
 pred show{}
 
