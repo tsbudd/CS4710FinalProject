@@ -53,10 +53,52 @@ fact eitherFullOrEmpty{
 	( c.account = e iff c.account = f) and ( c.bank = e iff c.bank = f)
 }
 
-// find the cashmo of that a person owns
-fun lookupCashmo [c: Client]: set Cashmo{
+assert clientExists{
+	all c: Client | c = lookupClient[c]
+}
+//check clientExists for 1 Client
+
+assert clientHasCashmo{
+	all c: Client | c.account = lookupCashmo[c]
+}
+//check clientHasCashmo for 1 Client
+
+assert clientHasUnsatisfiableCashmoAtStart{
+	no c: Client |
+	c.account = lookupCashmoSatisfiability[c.account]
+}
+//check clientHasUnsatisfiableCashmoAtStart for 15 Client, 30 Account, 1 State
+
+assert clientHasSatisfiableBankAtStart{
+	all c: Client |
+	c.bank = lookupBankSatisfiability[c]
+}
+//check clientHasEmptyCashmoAtStart for 1 Client, 15 Account, 1 State
+
+// find a client
+fun lookupClient [c: Client]: lone Client{
+	c & Client
+}
+
+// find the cashmo of that a client owns
+fun lookupCashmo [c: Client]: one Cashmo{
 	c.account & Cashmo
 }
+
+// find the satisfiability of a cashmo
+fun lookupCashmoSatisfiability [a: Cashmo]: lone Cashmo{
+	a & State.sufficient
+}
+
+// find the satisfiable banks a client owns
+fun lookupBankSatisfiability [c: Client]: set Bank{
+	c.bank & State.sufficient
+}
+
+ //transfer funds from bank
+//pred transferFromBank[c: Client, a: Cashmo, b: Bank] {
+//	b = a
+//}
 
 pred show{}
 

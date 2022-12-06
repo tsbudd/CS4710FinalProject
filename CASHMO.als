@@ -1,11 +1,11 @@
 // this is the model for CASHMO
-module cashmo
+module cashmoHelp
 
 open util/ordering[State] as ord
 
 sig Client{
 	account: lone Cashmo,
-	bank: lone Bank
+	bank: set Bank
 }
 
 abstract sig Account{
@@ -39,37 +39,70 @@ fact initialState{
 // and that if the cashmo account or the bank account is empty, then it cannot be sufficient
 fact eitherSufficientOrNotSufficient{
 	no c : Client, s: State.sufficient, n: State.notSufficient |
-	(c.account = s && c.account = n) && (c.bank = s && c.bank = n)
+	(c.account = s iff c.account = n) and (c.bank = s iff c.bank = n)
 }
 
 fact notEmptyAndSufficient{
 	no c : Client, e: State.empty, s: State.sufficient |
-	( c.account = e && c.account = s ) && ( c.bank = e && c.bank = s )
+	( c.account = e iff c.account = s ) and ( c.bank = e iff c.bank = s )
 }
 
 // ensuring that a bank or Cashmo account cannot be empty AND full at the same State
 fact eitherFullOrEmpty{
 	no e : State.empty, f : State.full, c : Client |
-	( c.account = e && c.account = f) && ( c.bank = e && c.bank = f)
+	( c.account = e iff c.account = f) and ( c.bank = e iff c.bank = f)
 }
 
-// find the cashmo of that a person owns
-fun lookupCashmo [c: Client]: set Cashmo{
+assert clientExists{
+	all c: Client | c = lookupClient[c]
+}
+//check clientExists for 1 Client
+
+assert clientHasCashmo{
+	all c: Client | c.account = lookupCashmo[c]
+}
+//check clientHasCashmo for 1 Client
+
+assert clientHasUnsatisfiableCashmoAtStart{
+	no c: Client |
+	c.account = lookupCashmoSatisfiability[c.account]
+}
+//check clientHasUnsatisfiableCashmoAtStart for 15 Client, 30 Account, 1 State
+
+assert clientHasSatisfiableBankAtStart{
+	all c: Client |
+	c.bank = lookupBankSatisfiability[c]
+}
+//check clientHasEmptyCashmoAtStart for 1 Client, 15 Account, 1 State
+
+// find a client
+fun lookupClient [c: Client]: lone Client{
+	c & Client
+}
+
+// find the cashmo of that a client owns
+fun lookupCashmo [c: Client]: one Cashmo{
 	c.account & Cashmo
 }
 
+// find the satisfiability of a cashmo
+fun lookupCashmoSatisfiability [a: Cashmo]: lone Cashmo{
+	a & State.sufficient
+}
+
+// find the satisfiable banks a client owns
+fun lookupBankSatisfiability [c: Client]: set Bank{
+	c.bank & State.sufficient
+}
+
+ //transfer funds from bank
+//pred transferFromBank[c: Client, a: Cashmo, b: Bank] {
+//	b = a
+//}
+
 pred show{}
 
-run show for exactly 2 Client, 4 Account, 2 State
-
-
-
-
-
-
-
-
-
+run show for 2 Client, 4 Account, 2 State
 
 
 
