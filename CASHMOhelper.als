@@ -1,11 +1,11 @@
 // this is the model for CASHMO
-module cashmo
+module cashmoHelp
 
 open util/ordering[State] as ord
 
 sig Client{
 	account: lone Cashmo,
-	bank: lone Bank
+	bank: some Bank
 }
 
 abstract sig Account{
@@ -39,19 +39,18 @@ fact initialState{
 // and that if the cashmo account or the bank account is empty, then it cannot be sufficient
 fact eitherSufficientOrNotSufficient{
 	no c : Client, s: State.sufficient, n: State.notSufficient |
-	( c.account = s iff c.account = n ) && ( c.bank = s iff (c.bank = n) )
+	(c.account = s iff c.account = n) and (c.bank = s iff c.bank = n)
 }
 
 fact notEmptyAndSufficient{
-	no c : Client, s: State.sufficient, e: State.empty |
-	( c.account = s iff c.account = e) && ( c.bank = s iff c.bank = e)
+	no c : Client, e: State.empty, s: State.sufficient |
+	( c.account = e iff c.account = s ) and ( c.bank = e iff c.bank = s )
 }
 
 // ensuring that a bank or Cashmo account cannot be empty AND full at the same State
 fact eitherFullOrEmpty{
-	no c: Client, e : State.empty, f : State.full |
-	( (c.account = e) iff ( c.account = f) ) && 
-	( (c.bank = e) iff ( c.bank = f) )
+	no e : State.empty, f : State.full, c : Client |
+	( c.account = e iff c.account = f) and ( c.bank = e iff c.bank = f)
 }
 
 // find the cashmo of that a person owns
@@ -59,26 +58,6 @@ fun lookupCashmo [c: Client]: set Cashmo{
 	c.account & Cashmo
 }
 
-
-//
-//pred transferFromBank [c: Client]{
-//	iff 
-//}
-
-
-//assert namesResolve {
-//  all b: Book | inv[b] =>
-//    all n: Name | some b.addr[n] => some lookup[b, n]
-//}
-//fun transferFunds [c: Client, s: State]: set Cashmo{
-//	
-//}
-
-
-//fun lookup [b: Book, n: Name] : set Addr {
-//  n.^(b.addr) & Addr
-//}
-
 pred show{}
 
-run show for exactly 3 Client, 6 Account, 2 State
+run show for  2 Client, 4 Account, 2 State

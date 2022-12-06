@@ -58,19 +58,6 @@ fun lookupCashmo [c: Client]: set Cashmo{
 	c.account & Cashmo
 }
 
-//pred notBoth[a: Account, s1: State, s2: State]{
-//	
-//}
-
-//fun lookupCashmoSufficiency [c: Client, s: State]: set Cashmo{
-//	
-//}
-
-
-//fun lookup [b: Book, n: Name] : set Addr {
-//  n.^(b.addr) & Addr
-//}
-
 pred show{}
 
 run show for exactly 2 Client, 4 Account, 2 State
