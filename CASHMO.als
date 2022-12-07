@@ -95,9 +95,27 @@ fun lookupBankSatisfiability [c: Client]: set Bank{
 	c.bank & State.sufficient
 }
 
- //transfer funds from bank
-//pred transferFromBank[c: Client, a: Cashmo, b: Bank] {
-//	b = a
+// //transfer funds from bank
+pred transferFromBank[t: Cashmo, f: Bank, s: State] {
+	t = s.full and f = s.empty
+}
+
+ //transfer funds to bank
+pred transferToBank[t: Bank, f: Cashmo, s: State] {
+	t = s.full and f = s.empty
+}
+
+ //transfer funds to client
+pred transferToClient[f: Client, t : Client, s: State] {
+	lookupCashmo[t] = s.full and
+	lookupCashmo[f] = s.empty
+}
+
+//fact stateTransition{
+//	one s: State, n: ord/next[s] { 
+//	Client.account in s.empty and Client.bank in s.full => 
+//		transferFromBank[Client.account, Client.bank, n]
+//	}
 //}
 
 pred show{}

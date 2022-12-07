@@ -5,7 +5,7 @@ open util/ordering[State] as ord
 
 sig Client{
 	account: lone Cashmo,
-	bank: some Bank
+	bank: set Bank
 }
 
 abstract sig Account{
@@ -30,10 +30,10 @@ fact eachHasOneOfEach{
 
 // all external bank accounts are full and all Cashmo accounts are empty at start
 // if an Account object is empty, it is not sufficient to transfer funds out of
-fact initialState{
-	let s0 = ord/first, c = Client | 
-	( s0.empty = c.account && s0.full = c.bank && s0.sufficient = c.bank && s0.notSufficient = c.account)
-}
+//fact initialState{
+//	let s0 = ord/first, c = Client | 
+//	( s0.empty = c.account && s0.full = c.bank && s0.sufficient = c.bank && s0.notSufficient = c.account)
+//}
 
 // ensuring that each bank or Cashmo accounts cannot be sufficient AND not sufficient at the same state
 // and that if the cashmo account or the bank account is empty, then it cannot be sufficient
@@ -95,11 +95,36 @@ fun lookupBankSatisfiability [c: Client]: set Bank{
 	c.bank & State.sufficient
 }
 
- //transfer funds from bank
-//pred transferFromBank[c: Client, a: Cashmo, b: Bank] {
-//	b = a
+// //transfer funds from bank
+pred transferFromBank[t: Cashmo, f: Bank, s: State] {
+	t = s.full and f = s.empty
+}
+
+ //transfer funds to bank
+pred transferToBank[t: Bank, f: Cashmo, s: State] {
+	t = s.full and f = s.empty
+}
+
+ //transfer funds to client
+pred transferToClient[f: Client, t : Client, s: State] {
+	lookupCashmo[t] = s.full and
+	lookupCashmo[f] = s.empty
+}
+
+//fact stateTransition{
+//	one s: State, n: ord/next[s] { 
+//	Client.account in s.empty and Client.bank in s.full => 
+//		transferFromBank[Client.account, Client.bank, n]
+//	}
 //}
 
 pred show{}
 
-run show for  2 Client, 4 Account, 2 State
+run show for exactly 2 Client, 4 Account, 2 State
+
+
+
+
+
+
+
