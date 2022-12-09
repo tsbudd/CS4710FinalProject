@@ -1,5 +1,5 @@
 // this is the model for CASHMO
-module cashmoHelp
+module cashmo
 
 open util/ordering[State] as ord
 
